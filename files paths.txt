@@ -1,0 +1,9 @@
+my-tauri-app/
+├── Cargo.toml
+├── build.rs
+├── src/
+│   └── main.rs
+└── src-tauri/ (or .tauri/)
+    ├── tauri.conf.json
+    └── capabilities/
+        └── capabilities.json

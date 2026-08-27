@@ -1,0 +1,100 @@
+# TAURI + VITE + REACT CONFIGURATION FILES
+
+## 1. src-tauri/tauri.conf.json
+Place this file inside your `src-tauri` directory.
+--------------------------------------------------
+{
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build",
+    "devUrl": "http://localhost:5173",
+    "frontendDist": "../dist"
+  },
+  "package": {
+    "productName": "tauri-app",
+    "version": "0.0.0"
+  },
+  "tauri": {
+    "allowlist": {
+      "all": false
+    },
+    "bundle": {
+      "active": true,
+      "targets": "all",
+      "identifier": "com.tauri.dev",
+      "icon": [
+        "icons/32x32.png",
+        "icons/128x128.png",
+        "icons/128x128@2x.png",
+        "icons/icon.icns",
+        "icons/icon.ico"
+      ]
+    },
+    "security": {
+      "csp": null
+    },
+    "windows": [
+      {
+        "title": "Tauri App",
+        "width": 800,
+        "height": 600
+      }
+    ]
+  }
+}
+
+## 2. vite.config.js
+Place this file in your root project directory.
+--------------------------------------------------
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+  plugins: [react()],
+  // Prevent Vite from obscuring Tauri logs
+  clearScreen: false,
+  // Tauri expects a fixed port, fail if that port is not available
+  server: {
+    host: 'localhost',
+    port: 5173,
+    strictPort: true,
+  },
+  // Env variables starting with "TAURI_" are exposed
+  envPrefix: ['VITE_', 'TAURI_'],
+  build: {
+    // Tauri supports es2021
+    target: process.env.TAURI_PLATFORM == 'windows' ? 'chrome105' : 'safari13',
+    // Don't minify for debug builds
+    minify: !process.env.TAURI_DEBUG ? 'esbuild' : false,
+    // Produce sourcemaps for debug builds
+    sourcemap: !!process.env.TAURI_DEBUG,
+  },
+});
+
+## 3. package.json
+Ensure your root package.json contains these scripts and dependencies.
+--------------------------------------------------
+{
+  "name": "tauri-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "tauri": "tauri"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^1.5.0",
+    "@tauri-apps/api": "^1.5.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "vite": "^5.0.0"
+  }
+}
